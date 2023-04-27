@@ -3,33 +3,45 @@ import {Box, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead
 import TableOrder from "../components/TableOrder.jsx";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import Stack from "@mui/material/Stack";
-import AddEditOrder from "./AddEditOrder.jsx";
-
+import {Link, useNavigate} from 'react-router-dom';
 
 function MyOrders() {
     const [orders, setOrders] = useState([]);
+    const [order, setOrder] = useState([]);
     const loadorders = () => {
         axios.get('http://localhost:8080/my-orders')
             .then(res => {
-                    console.log(res)
                     setOrders(res.data)
                 }
             )
     }
-
     useEffect(loadorders, []);
-    console.log(orders)
+
+
+    const deleteOrder = (order) => {
+        axios
+            .delete(`http://localhost:8080/my-orders/${order.id}`)
+            .then((res) => {
+                console.log('Item successfully deleted.');
+                loadorders();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
     return (
         <Box sx={{width: '100%'}}>
             <Grid container spacing={{md: 3}}>
                 <Grid item md={9}>
-                    <TableOrder orders={orders}/>
+                    <TableOrder orders={orders} onDelete={deleteOrder}/>
                 </Grid>
                 <Grid item md={3}>
-                    <Button color="secondary" href="http://127.0.0.1:5173/add-order" sx={{m: 1}}>
-                        new order
-                    </Button>
+                    <Link to={'/add-order/'}>
+                        <Button variant="outlined" color="secondary" sx={{m: 1}}>
+                            new order
+                        </Button>
+                    </Link>
                 </Grid>
             </Grid>
         </Box>
